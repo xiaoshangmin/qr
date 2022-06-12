@@ -8,7 +8,7 @@ from amzqr.mylibs import data, ECC, structure, matrix, draw
 def get_qrcode(ver, ecl, str, save_place):
     # Data Coding
     ver, data_codewords = data.encode(ver, ecl, str)
-
+    
     # Error Correction Coding
     ecc = ECC.encode(ver, ecl, data_codewords)
     
