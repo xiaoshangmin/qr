@@ -12,11 +12,12 @@ def encode(ver, ecl, str):
         'byte': byte_encoding,
         'kanji': kanji_encoding
     }
-
+    #ver所选纠错级别(ecl)对应的最低版本 mode编码类型
     ver, mode = analyse(ver, ecl, str)
 
     print('line 16: mode:', mode, ver)
 
+    #模式指示符+字符计数指示符+
     code = mode_indicator[mode] + \
         get_cci(ver, mode, str) + mode_encoding[mode](str)
 
@@ -112,7 +113,9 @@ def kanji_encoding(str):
 
 # cci: character count indicator
 
-
+#字符计数指示符
+#不同模式对应版本有特定的位长
+#计算原始输入文本的字符数，将其转为二进制数字。根据版本和编码模式找到对应的位长，不够位长的在前面加 0 补齐。
 def get_cci(ver, mode, str):
     if 1 <= ver <= 9:
         cci_len = (10, 9, 8, 8)[mindex[mode]]
