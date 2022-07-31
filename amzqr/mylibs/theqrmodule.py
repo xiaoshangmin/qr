@@ -5,10 +5,12 @@ from amzqr.mylibs import data, ECC, structure, matrix, draw
 # ver: Version from 1 to 40
 # ecl: Error Correction Level (L,M,Q,H)
 # get a qrcode picture of 3*3 pixels per module
+# 模式指示符+字符数+数据
+#https://coolshell.cn/articles/10590.html#%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86
 def get_qrcode(ver, ecl, str, save_place):
     # Data Coding
     ver, data_codewords = data.encode(ver, ecl, str)
-    
+
     # Error Correction Coding
     ecc = ECC.encode(ver, ecl, data_codewords)
     

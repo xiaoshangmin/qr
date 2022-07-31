@@ -3,7 +3,6 @@
 
 import os
 
-import cv2
 from amzqr.mylibs import theqrmodule
 from PIL import Image
 
@@ -58,23 +57,22 @@ def run(words, version=1, level='H', picture=None, colorized=False, contrast=1.0
         from amzqr.mylibs.constant import alig_location
         from PIL import ImageEnhance, ImageFilter
         
-        qr = Image.open(qr_name)   
+        qr = Image.open(qr_name)
         qr = qr.convert('RGBA') if colorized else qr
 
         bg0 = Image.open(bg_name).convert('RGBA')
         bg0 = ImageEnhance.Contrast(bg0).enhance(contrast)
         bg0 = ImageEnhance.Brightness(bg0).enhance(brightness)
 
-        #背景图调整大小
+        #背景图调整到和二维码去除白色边框后的大小
         if bg0.size[0] < bg0.size[1]:
             bg0 = bg0.resize(
-                (qr.size[0]-24, (qr.size[0]-24)*int(bg0.size[1]/bg0.size[0])))
+                (qr.size[0]-6, (qr.size[0]-6)*int(bg0.size[1]/bg0.size[0])))
         else:
             bg0 = bg0.resize(
-                ((qr.size[1]-24)*int(bg0.size[0]/bg0.size[1]), qr.size[1]-24))
+                ((qr.size[1]-6)*int(bg0.size[0]/bg0.size[1]), qr.size[1]-6))
 
         bg = bg0 if colorized else bg0.convert('1')
-
         aligs = []
         # 校正图形只有version 2以上的二维码才需要
         if ver > 1:
