@@ -6,6 +6,7 @@ import os
 from amzqr.mylibs import theqrmodule
 from PIL import Image
 
+
 # Positional parameters
 #   words: str
 #
@@ -22,8 +23,8 @@ from PIL import Image
 # See [https://github.com/sylnsfar/qrcode] for more details!
 
 
-def run(words, version=1, level='H', picture=None, colorized=False, contrast=1.0, brightness=1.0, save_name=None, save_dir=os.getcwd()):
-
+def run(words, version=1, level='H', picture=None, colorized=False, contrast=1.0, brightness=1.0, save_name=None,
+        save_dir=os.getcwd()):
     # check every parameter
     if not isinstance(words, str):
         raise ValueError(
@@ -35,7 +36,8 @@ def run(words, version=1, level='H', picture=None, colorized=False, contrast=1.0
         raise ValueError(
             "Wrong level! Please choose a str-type level from {'L','M','Q','H'}!")
     if picture:
-        if not isinstance(picture, str) or not os.path.isfile(picture) or picture[-4:] not in ('.jpg', '.png', '.bmp', '.gif'):
+        if not isinstance(picture, str) or not os.path.isfile(picture) or picture[-4:] not in (
+                '.jpg', '.png', '.bmp', '.gif'):
             raise ValueError(
                 "Wrong picture! Input a filename that exists and be tailed with one of {'.jpg', '.png', '.bmp', '.gif'}!")
         if picture[-4:] == '.gif' and save_name and save_name[-4:] != '.gif':
@@ -52,11 +54,12 @@ def run(words, version=1, level='H', picture=None, colorized=False, contrast=1.0
             "Wrong save_name! Input a filename tailed with one of {'.jpg', '.png', '.bmp', '.gif'}!")
     if not os.path.isdir(save_dir):
         raise ValueError('Wrong save_dir! Input a existing-directory!')
+
     # ver:版本  qr_name:二维码 bg_name：背景图 colorized：彩色
     def combine(ver, qr_name, bg_name, colorized, contrast, brightness, save_dir, save_name=None):
         from amzqr.mylibs.constant import alig_location
         from PIL import ImageEnhance, ImageFilter
-        
+
         qr = Image.open(qr_name)
         qr = qr.convert('RGBA') if colorized else qr
 
@@ -64,33 +67,37 @@ def run(words, version=1, level='H', picture=None, colorized=False, contrast=1.0
         bg0 = ImageEnhance.Contrast(bg0).enhance(contrast)
         bg0 = ImageEnhance.Brightness(bg0).enhance(brightness)
 
-        #背景图调整到和二维码去除白色边框后的大小
+        # 背景图调整到和二维码去除白色边框后的大小
         if bg0.size[0] < bg0.size[1]:
             bg0 = bg0.resize(
-                (qr.size[0]-6, (qr.size[0]-6)*int(bg0.size[1]/bg0.size[0])))
+                (qr.size[0] - 24, (qr.size[0] - 24) * int(bg0.size[1] / bg0.size[0])))
         else:
             bg0 = bg0.resize(
-                ((qr.size[1]-6)*int(bg0.size[0]/bg0.size[1]), qr.size[1]-6))
+                ((qr.size[1] - 24) * int(bg0.size[0] / bg0.size[1]), qr.size[1] - 24))
 
         bg = bg0 if colorized else bg0.convert('1')
+
         aligs = []
-        # 校正图形只有version 2以上的二维码才需要
+        # 校正图形只有version 2以上的二维码才有
         if ver > 1:
-            aloc = alig_location[ver-2]
+            aloc = alig_location[ver - 2]
             for a in range(len(aloc)):
                 for b in range(len(aloc)):
-                    if not ((a == b == 0) or (a == len(aloc)-1 and b == 0) or (a == 0 and b == len(aloc)-1)):
-                        for i in range(3*(aloc[a]-2), 3*(aloc[a]+3)):
-                            for j in range(3*(aloc[b]-2), 3*(aloc[b]+3)):
+                    if not ((a == b == 0) or (a == len(aloc) - 1 and b == 0) or (a == 0 and b == len(aloc) - 1)):
+                        for i in range(3 * (aloc[a] - 2), 3 * (aloc[a] + 3)):
+                            for j in range(3 * (aloc[b] - 2), 3 * (aloc[b] + 3)):
                                 aligs.append((i, j))
+
         # 把背景图填充到二维码中
-        for i in range(qr.size[0]-24):
-            for j in range(qr.size[1]-24):
-                if not ((i in (18, 19, 20)) or (j in (18, 19, 20)) or (i < 24 and j < 24) or (i < 24 and j > qr.size[1]-49) or (i > qr.size[0]-49 and j < 24) or ((i, j) in aligs) or (i % 3 == 1 and j % 3 == 1) or (bg0.getpixel((i, j))[3] == 0)):
-                    qr.putpixel((i+12, j+12), bg.getpixel((i, j)))
+        for i in range(qr.size[0] - 24):
+            for j in range(qr.size[1] - 24):
+                if not ((i in (18, 19, 20)) or (j in (18, 19, 20)) or (i < 24 and j < 24) or (
+                        i < 24 and j > qr.size[1] - 49) or (i > qr.size[0] - 49 and j < 24) or ((i, j) in aligs) or (
+                                i % 3 == 1 and j % 3 == 1) or (bg0.getpixel((i, j))[3] == 0)):
+                    qr.putpixel((i + 12, j + 12), bg.getpixel((i, j)))
 
         qr_name = os.path.join(save_dir, os.path.splitext(os.path.basename(bg_name))[
-                               0] + '_qrcode.png') if not save_name else os.path.join(save_dir, save_name)
+            0] + '_qrcode.png') if not save_name else os.path.join(save_dir, save_name)
         # qr.resize((qr.size[0]*3, qr.size[1]*3)).save(qr_name)
         qr.resize((200, 200)).save(qr_name)
         return qr_name
@@ -112,21 +119,21 @@ def run(words, version=1, level='H', picture=None, colorized=False, contrast=1.0
                 try:
                     seq = im.tell()
                     im.seek(seq + 1)
-                    im.save(os.path.join(tempdir, '%s.png' % (seq+1)))
+                    im.save(os.path.join(tempdir, '%s.png' % (seq + 1)))
                 except EOFError:
                     break
 
             imsname = []
-            for s in range(seq+1):
+            for s in range(seq + 1):
                 bg_name = os.path.join(tempdir, '%s.png' % s)
                 imsname.append(combine(ver, qr_name, bg_name,
-                               colorized, contrast, brightness, tempdir))
+                                       colorized, contrast, brightness, tempdir))
 
             ims = [imageio.imread(pic) for pic in imsname]
             qr_name = os.path.join(save_dir, os.path.splitext(os.path.basename(picture))[
-                                   0] + '_qrcode.gif') if not save_name else os.path.join(save_dir, save_name)
+                0] + '_qrcode.gif') if not save_name else os.path.join(save_dir, save_name)
             imageio.mimwrite(qr_name, ims, '.gif', **
-                             {'duration': duration/1000})
+            {'duration': duration / 1000})
         elif picture:
             qr_name = combine(ver, qr_name, picture, colorized,
                               contrast, brightness, save_dir, save_name)
@@ -134,7 +141,7 @@ def run(words, version=1, level='H', picture=None, colorized=False, contrast=1.0
             qr = Image.open(qr_name)
             qr_name = os.path.join(save_dir, os.path.basename(
                 qr_name)) if not save_name else os.path.join(save_dir, save_name)
-            qr.resize((qr.size[0]*3, qr.size[1]*3)).save(qr_name)
+            qr.resize((qr.size[0] * 3, qr.size[1] * 3)).save(qr_name)
 
         return ver, level, qr_name
 
