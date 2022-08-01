@@ -66,14 +66,14 @@ def run(words, version=1, level='H', picture=None, colorized=False, contrast=1.0
         bg0 = Image.open(bg_name).convert('RGBA')
         bg0 = ImageEnhance.Contrast(bg0).enhance(contrast)
         bg0 = ImageEnhance.Brightness(bg0).enhance(brightness)
-
+        innerW = innerH = qr.size[0] - 6
         # 背景图调整到和二维码去除白色边框后的大小
         if bg0.size[0] < bg0.size[1]:
             bg0 = bg0.resize(
-                (qr.size[0] - 24, (qr.size[0] - 24) * int(bg0.size[1] / bg0.size[0])))
+                (innerW, innerW * int(bg0.size[1] / bg0.size[0])))
         else:
             bg0 = bg0.resize(
-                ((qr.size[1] - 24) * int(bg0.size[0] / bg0.size[1]), qr.size[1] - 24))
+                (innerW * int(bg0.size[0] / bg0.size[1]), innerW))
 
         bg = bg0 if colorized else bg0.convert('1')
 
@@ -89,12 +89,12 @@ def run(words, version=1, level='H', picture=None, colorized=False, contrast=1.0
                                 aligs.append((i, j))
 
         # 把背景图填充到二维码中
-        for i in range(qr.size[0] - 24):
-            for j in range(qr.size[1] - 24):
+        for i in range(innerW):
+            for j in range(innerW):
                 if not ((i in (18, 19, 20)) or (j in (18, 19, 20)) or (i < 24 and j < 24) or (
-                        i < 24 and j > qr.size[1] - 49) or (i > qr.size[0] - 49 and j < 24) or ((i, j) in aligs) or (
+                        i < 24 and j > innerW - 25) or (i > innerW - 25 and j < 24) or ((i, j) in aligs) or (
                                 i % 3 == 1 and j % 3 == 1) or (bg0.getpixel((i, j))[3] == 0)):
-                    qr.putpixel((i + 12, j + 12), bg.getpixel((i, j)))
+                    qr.putpixel((i + 3, j + 3), bg.getpixel((i, j)))
 
         qr_name = os.path.join(save_dir, os.path.splitext(os.path.basename(bg_name))[
             0] + '_qrcode.png') if not save_name else os.path.join(save_dir, save_name)
